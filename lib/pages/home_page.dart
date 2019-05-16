@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:study_flutter/bean/article_bean.dart';
+import 'package:study_flutter/dao/Article.dart';
 import 'package:study_flutter/dao/db/database.dart';
 import 'package:study_flutter/pages/starred_list_page.dart';
 import 'package:study_flutter/utils/date_util.dart';
 import 'package:study_flutter/utils/sp_store_util.dart';
 import 'package:study_flutter/utils/constant.dart';
+import 'package:study_flutter/utils/toast.dart';
 
 class HomePage extends StatefulWidget {
   final ArticleBean article;
@@ -62,31 +64,11 @@ class _HomePageState extends State<HomePage> {
                 title: Text(article.data.title),
                 centerTitle: true,
                 leading:
-                    IconButton(icon: Icon(Icons.menu), onPressed: (){
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (BuildContext context) {
-                            return new StaredListPage();
-                          })).then((result) {
-                        if (result is ArticleBean) {
-                          // Clicked a starred article and back
-                          setState(() {
-                            article = result;
-                            date = article.date;
-                          });
-                        } else {
-                          // Normally back, check current article's starred state
-                          provider.getFromDB(article.date).then((articleBean) {
-                            if (articleBean != null && articleBean.starred != article.starred) {
-                              setState(() => article.starred = articleBean.starred);
-                            }
-                          });
-                        }
-                      });
-                    }),
+                IconButton(icon: Icon(Icons.menu), onPressed: push),
                 actions: <Widget>[
                   IconButton(
                     icon:
-                        Icon(article.starred ? Icons.star : Icons.star_border),
+                    Icon(article.starred ? Icons.star : Icons.star_border),
                     onPressed: onStarPressed,
                   )
                 ],
@@ -104,7 +86,7 @@ class _HomePageState extends State<HomePage> {
                       child: Text.rich(
                         TextSpan(
                           text:
-                              "(${getRelatedTime(context, str2Date(article.data.date.curr))}，作者：${article.data.author}，字数：${article.data.wc})",
+                          "(${getRelatedTime(context, str2Date(article.data.date.curr))}，作者：${article.data.author}，字数：${article.data.wc})",
                           style: TextStyle(
                             color: Colors.grey,
                             fontSize: _fontSize - 3,
@@ -118,14 +100,29 @@ class _HomePageState extends State<HomePage> {
                     ),
                     SingleChildScrollView(
                         child: Text(
-                      article?.data?.content,
-                      style: TextStyle(fontSize: _fontSize),
-                      textAlign: TextAlign.start,
-                    ))
+                          article?.data?.content,
+                          style: TextStyle(fontSize: _fontSize),
+                          textAlign: TextAlign.start,
+                        ))
                   ],
                 ),
                 color: Color(0xCCCCCC)),
           )),
+      floatingActionButton: new Builder(builder: (BuildContext context) {
+        return new FloatingActionButton(
+          child: const Icon(Icons.date_range),
+          tooltip: "选择日期",
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.blue,
+          heroTag: null,
+          onPressed: (){
+            selectDate(context);
+          },
+          shape: new CircleBorder(),
+          isExtended: false,
+        );
+      }),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
@@ -137,49 +134,48 @@ class _HomePageState extends State<HomePage> {
   }
 
   void push() {
-//    Navigator.pushReplacement(context,
-//        MaterialPageRoute(builder: (BuildContext context) {
-//      return new StaredListPage();
-//    })).then((result) {
-//      if (result is ArticleBean) {
-//        // Clicked a starred article and back
-//        setState(() {
-//          article = result;
-//          date = article.date;
-//        });
-//      } else {
-//        // Normally back, check current article's starred state
-//        provider.getFromDB(article.date).then((articleBean) {
-//          if (articleBean != null && articleBean.starred != article.starred) {
-//            setState(() => article.starred = articleBean.starred);
-//          }
-//        });
-//      }
-//    });
-
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => StaredListPage()))
-        .then((result) {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (BuildContext context) {
+          return new StaredListPage();
+        })).then((result) {
       if (result is ArticleBean) {
-        // Clicked a starred article and back
         setState(() {
           article = result;
           date = article.date;
         });
       } else {
-        // Normally back, check current article's starred state
-        provider
-            .getFromDB(article.date)
-            .then((articleBean) {
-          if (articleBean != null &&
-              articleBean.starred != article.starred) {
-            setState(() =>
-            article.starred = articleBean.starred);
+        provider.getFromDB(article.date).then((articleBean) {
+          if (articleBean != null && articleBean.starred != article.starred) {
+            setState(() => article.starred = articleBean.starred);
           }
         });
       }
     });
+
   }
+
+
+  Future<void> selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: str2Date(article.date),
+        firstDate: DateTime(2015, 8),
+        lastDate: str2Date(article.date));
+    if (picked != null && picked != article.date){
+      ArticleBean bean = await Article.getArticle(date:formatDate(picked));
+      if(bean != null){
+        setState(() {
+          article = bean;
+          date = bean.date;
+        });
+      }
+
+    }else{
+     Toast.toast(context, "日期不合法，请重新选择");
+      selectDate(context);
+    }
+  }
+
+
+
 }
