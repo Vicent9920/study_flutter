@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:study_flutter/bean/article_bean.dart';
 import 'package:study_flutter/dao/Article.dart';
 import 'package:study_flutter/dao/db/database.dart';
 import 'package:study_flutter/pages/starred_list_page.dart';
+import 'package:study_flutter/utils/constant.dart';
 import 'package:study_flutter/utils/date_util.dart';
 import 'package:study_flutter/utils/sp_store_util.dart';
-import 'package:study_flutter/utils/constant.dart';
 import 'package:study_flutter/utils/toast.dart';
 
 class HomePage extends StatefulWidget {
@@ -63,13 +64,18 @@ class _HomePageState extends State<HomePage> {
                 snap: true,
                 title: Text(article.data.title),
                 centerTitle: true,
-                leading:
-                IconButton(icon: Icon(Icons.menu), onPressed: push),
+                leading: IconButton(icon: Icon(Icons.menu), onPressed: push),
                 actions: <Widget>[
                   IconButton(
                     icon:
-                    Icon(article.starred ? Icons.star : Icons.star_border),
-                    onPressed: onStarPressed,
+                        Icon(article.starred ? Icons.star : Icons.star_border),
+                    onPressed: () {
+                      showModalBottomSheet(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return _showBottomWidget(context);
+                          });
+                    },
                   )
                 ],
                 backgroundColor: themeColors[_themeColorIndex],
@@ -86,7 +92,7 @@ class _HomePageState extends State<HomePage> {
                       child: Text.rich(
                         TextSpan(
                           text:
-                          "(${getRelatedTime(context, str2Date(article.data.date.curr))}，作者：${article.data.author}，字数：${article.data.wc})",
+                              "(${getRelatedTime(context, str2Date(article.data.date.curr))}，作者：${article.data.author}，字数：${article.data.wc})",
                           style: TextStyle(
                             color: Colors.grey,
                             fontSize: _fontSize - 3,
@@ -100,10 +106,10 @@ class _HomePageState extends State<HomePage> {
                     ),
                     SingleChildScrollView(
                         child: Text(
-                          article?.data?.content,
-                          style: TextStyle(fontSize: _fontSize),
-                          textAlign: TextAlign.start,
-                        ))
+                      article?.data?.content,
+                      style: TextStyle(fontSize: _fontSize),
+                      textAlign: TextAlign.start,
+                    ))
                   ],
                 ),
                 color: Color(0xCCCCCC)),
@@ -115,7 +121,7 @@ class _HomePageState extends State<HomePage> {
           foregroundColor: Colors.white,
           backgroundColor: Colors.blue,
           heroTag: null,
-          onPressed: (){
+          onPressed: () {
             selectDate(context);
           },
           shape: new CircleBorder(),
@@ -134,10 +140,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   void push() {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (BuildContext context) {
-          return new StaredListPage();
-        })).then((result) {
+    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+      return new StaredListPage();
+    })).then((result) {
       if (result is ArticleBean) {
         setState(() {
           article = result;
@@ -151,9 +156,7 @@ class _HomePageState extends State<HomePage> {
         });
       }
     });
-
   }
-
 
   Future<void> selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
@@ -161,21 +164,142 @@ class _HomePageState extends State<HomePage> {
         initialDate: str2Date(article.date),
         firstDate: DateTime(2015, 8),
         lastDate: str2Date(article.date));
-    if (picked != null && picked != article.date){
-      ArticleBean bean = await Article.getArticle(date:formatDate(picked));
-      if(bean != null){
+    if (picked != null && picked != article.date) {
+      ArticleBean bean = await Article.getArticle(date: formatDate(picked));
+      if (bean != null) {
         setState(() {
           article = bean;
           date = bean.date;
         });
       }
-
-    }else{
-     Toast.toast(context, "日期不合法，请重新选择");
-      selectDate(context);
     }
   }
 
+  Widget _showBottomWidget(BuildContext context) {
+    return new Container(
+      color: Colors.transparent,
+      padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
+      height: 230,
+      child: new Column(
+        children: <Widget>[
+          _getItem(1),
+          _getItem(2),
+          _getItem(3),
+          _getItem(4),
+          _getItem(5),
+          new Container(
+            margin: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
+            height: 8,
+            color: Colors.blueGrey,
+          ),
+          new Center(
+            child: new Padding(
+                padding: EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 12.0),
+                child: new Text(
+                  '取  消',
+                  style: new TextStyle(fontSize: 18.0, color: Colors.blueGrey),
+                )),
+          )
+        ],
+      ),
+    );
+  }
 
+  /**
+   * 抽取item项
+   */
+  Widget _getItem(int index) {
+    TextStyle style = const TextStyle(color: Colors.white);
+    if (index & 1 == 1) {
+      switch (index) {
+        case 1:
+          return new Padding(
+            padding: EdgeInsets.fromLTRB(36, 0, 36.0, 0),
+            child: MaterialButton(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(
+                    article?.starred ? Icons.star : Icons.star_border,
+                    color: Colors.white,
+                  ),
+                  Container(
+                    width: 6,
+                  ),
+                  Text(
+                    article?.starred ? "已收藏" : "未收藏",
+                    style: style,
+                  )
+                ],
+              ),
+              color: Colors.blue,
+              onPressed: onStarPressed,
+            ),
+          );
+        case 3:
+          return new Padding(
+            padding: EdgeInsets.fromLTRB(36, 0, 36.0, 0),
+            child: MaterialButton(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(
+                    Icons.share,
+                    color: Colors.white,
+                  ),
+                  Container(
+                    width: 6,
+                  ),
+                  Text(
+                    "分享",
+                    style: style,
+                  )
+                ],
+              ),
+              color: Colors.blue,
+              onPressed: (){
 
+              },
+            ),
+          );
+        case 5:
+          return new Padding(
+            padding: EdgeInsets.fromLTRB(36, 0, 36.0, 0),
+            child: MaterialButton(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(
+                    Icons.content_copy,
+                    color: Colors.white,
+                  ),
+                  Container(
+                    width: 6,
+                  ),
+                  Text(
+                    "复制",
+                    style: style,
+                  )
+                ],
+              ),
+              color: Colors.blue,
+              onPressed: () {
+                ClipboardData data = new ClipboardData(
+                    text:
+                        r"(${getRelatedTime(context, str2Date(article.data.date.curr))}，作者：${article.data.author}，字数：${article.data.wc})\n${article?.data.content}");
+                Clipboard.setData(data);
+                Toast.toast(context, "复制成功");
+              },
+            ),
+          );
+      }
+    } else {
+      return new Container(
+        height: 4,
+        color: Colors.transparent,
+//      ListTile
+        child: new Text(""),
+      );
+    }
+  }
 }
