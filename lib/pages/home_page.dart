@@ -233,7 +233,10 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               color: Colors.blue,
-              onPressed: onStarPressed,
+              onPressed: (){
+                onStarPressed();
+                Navigator.of(context).pop();
+              },
             ),
           );
         case 3:
@@ -258,7 +261,7 @@ class _HomePageState extends State<HomePage> {
               ),
               color: Colors.blue,
               onPressed: (){
-
+                Navigator.of(context).pop();
               },
             ),
           );
@@ -286,9 +289,10 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 ClipboardData data = new ClipboardData(
                     text:
-                        r"(${getRelatedTime(context, str2Date(article.data.date.curr))}，作者：${article.data.author}，字数：${article.data.wc})\n${article?.data.content}");
+                        "(${getRelatedTime(context, str2Date(article.data.date.curr))}，作者：${article.data.author}，字数：${article.data.wc})\n${article?.data.content}");
                 Clipboard.setData(data);
                 Toast.toast(context, "复制成功");
+                Navigator.of(context).pop();
               },
             ),
           );
