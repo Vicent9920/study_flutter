@@ -22,6 +22,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   ArticleBean article;
+  final platform = const MethodChannel("samples.flutter.io/share");
   String date = formatDate(DateTime.now());
 
   _HomePageState(this.article);
@@ -67,8 +68,7 @@ class _HomePageState extends State<HomePage> {
                 leading: IconButton(icon: Icon(Icons.menu), onPressed: push),
                 actions: <Widget>[
                   IconButton(
-                    icon:
-                        Icon(article.starred ? Icons.star : Icons.star_border),
+                    icon: Icon(Icons.more_vert),
                     onPressed: () {
                       showModalBottomSheet(
                           context: context,
@@ -233,13 +233,44 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               color: Colors.blue,
-              onPressed: (){
+              onPressed: () {
                 onStarPressed();
                 Navigator.of(context).pop();
               },
             ),
           );
         case 3:
+          return new Padding(
+            padding: EdgeInsets.fromLTRB(36, 0, 36.0, 0),
+            child: MaterialButton(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(
+                    Icons.content_copy,
+                    color: Colors.white,
+                  ),
+                  Container(
+                    width: 6,
+                  ),
+                  Text(
+                    "复制内容",
+                    style: style,
+                  )
+                ],
+              ),
+              color: Colors.blue,
+              onPressed: () {
+                ClipboardData data = new ClipboardData(
+                    text:
+                        "${article.data.title}，作者：${article.data.author}，字数：${article.data.wc})\n${article?.data.content}");
+                Clipboard.setData(data);
+                Toast.toast(context, "复制成功");
+                Navigator.of(context).pop();
+              },
+            ),
+          );
+        case 5:
           return new Padding(
             padding: EdgeInsets.fromLTRB(36, 0, 36.0, 0),
             child: MaterialButton(
@@ -260,40 +291,7 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               color: Colors.blue,
-              onPressed: (){
-                Navigator.of(context).pop();
-              },
-            ),
-          );
-        case 5:
-          return new Padding(
-            padding: EdgeInsets.fromLTRB(36, 0, 36.0, 0),
-            child: MaterialButton(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Icon(
-                    Icons.content_copy,
-                    color: Colors.white,
-                  ),
-                  Container(
-                    width: 6,
-                  ),
-                  Text(
-                    "复制",
-                    style: style,
-                  )
-                ],
-              ),
-              color: Colors.blue,
-              onPressed: () {
-                ClipboardData data = new ClipboardData(
-                    text:
-                        "(${getRelatedTime(context, str2Date(article.data.date.curr))}，作者：${article.data.author}，字数：${article.data.wc})\n${article?.data.content}");
-                Clipboard.setData(data);
-                Toast.toast(context, "复制成功");
-                Navigator.of(context).pop();
-              },
+              onPressed: _shaerMsg,
             ),
           );
       }
@@ -304,6 +302,17 @@ class _HomePageState extends State<HomePage> {
 //      ListTile
         child: new Text(""),
       );
+    }
+  }
+
+  Future<Null> _shaerMsg() async {
+    try {
+//      在通道上调用此方法
+      platform.invokeMethod("shareMsg",
+          "来自烤鱼的一文APP：\n${article.data.title}，作者：${article.data.author}，字数：${article.data.wc})\n${article?.data.content}");
+      Navigator.of(context).pop();
+    } on PlatformException catch (e) {
+      Navigator.of(context).pop();
     }
   }
 }
