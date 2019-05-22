@@ -17,5 +17,8 @@
   "content_not_starred" : "还没有收藏任何文章",
   "random": "随机",
   "day_after": "后一天",
-  "day_before": "前一天"
+  "day_before": "前一天",
+  "select_date": "选择日期",
+  "copy_content": "复制内容",
+  "action_share": "分享"
 }

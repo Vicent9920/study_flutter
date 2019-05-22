@@ -17,5 +17,8 @@
   "content_not_starred" : "No articles have been starred yet.",
   "random": "Random",
   "day_after": "Day After",
-  "day_before": "Day Before"
+  "day_before": "Day Before",
+  "select_date": "Select Date",
+  "copy_content": "Copy Content",
+  "action_share": "Share"
 }

@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:study_flutter/generated/i18n.dart';
 
 
 String getRelatedTime(BuildContext context, DateTime date) {
@@ -7,9 +8,9 @@ String getRelatedTime(BuildContext context, DateTime date) {
 
   if (subDay >= 0) {
     if (subDay < 1) {
-      return "今天";
+      return S.of(context).today;
     } else if (subDay < 2) {
-      return "昨天";
+      return S.of(context).yesterday;
     }
   }
   return formatDate(date);

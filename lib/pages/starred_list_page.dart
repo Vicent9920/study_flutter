@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:study_flutter/bean/article_bean.dart';
 import 'package:study_flutter/dao/db/database.dart';
+import 'package:study_flutter/generated/i18n.dart';
 import 'package:study_flutter/utils/date_util.dart';
 
 class StaredListPage extends StatefulWidget {
@@ -28,7 +29,7 @@ class _StaredListPageState extends State<StaredListPage> {
     TextStyle style = TextStyle(color: Colors.grey);
     return Scaffold(
       appBar: AppBar(
-          title: Text("收藏列表"),
+          title: Text(S.of(context).action_starred_list),
           actions: <Widget>[
             IconButton(
               icon: Icon(_articles.length > 0 ? Icons.delete : null),
@@ -46,18 +47,18 @@ class _StaredListPageState extends State<StaredListPage> {
     showDialog(
         context: context,
         builder: (_) => AlertDialog(
-              title: Text("确定要清空所有收藏吗"),
+              title: Text(S.of(context).title_clear_starred),
               actions: <Widget>[
                 FlatButton(
                   child: Text(
-                    "取消",
+                    S.of(context).action_cancel,
                     style: style,
                   ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
                 FlatButton(
                   child: Text(
-                    "确定",
+                    S.of(context).action_ok,
                     style: style,
                   ),
                   onPressed: () {
@@ -78,7 +79,7 @@ class _StaredListPageState extends State<StaredListPage> {
     if (_articles.length < 1) {
       return Center(
         child: Text(
-          "目前还没有收藏任何文章",
+          S.of(context).content_not_starred,
           style: TextStyle(fontSize: 18),
         ),
       );

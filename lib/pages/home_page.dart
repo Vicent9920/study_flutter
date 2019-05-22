@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:study_flutter/bean/article_bean.dart';
 import 'package:study_flutter/dao/Article.dart';
 import 'package:study_flutter/dao/db/database.dart';
+import 'package:study_flutter/generated/i18n.dart';
 import 'package:study_flutter/pages/starred_list_page.dart';
 import 'package:study_flutter/utils/constant.dart';
 import 'package:study_flutter/utils/date_util.dart';
@@ -28,7 +29,6 @@ class _HomePageState extends State<HomePage> {
   _HomePageState(this.article);
 
   double _fontSize = 18;
-  TabController _tabController;
   int _themeColorIndex = 0;
 
   ArticleProvider provider;
@@ -48,7 +48,6 @@ class _HomePageState extends State<HomePage> {
           if (value != _themeColorIndex) {
             setState(() {
               _themeColorIndex = value;
-              _tabController.index = value;
             });
           }
         });
@@ -92,7 +91,7 @@ class _HomePageState extends State<HomePage> {
                       child: Text.rich(
                         TextSpan(
                           text:
-                              "(${getRelatedTime(context, str2Date(article.data.date.curr))}，作者：${article.data.author}，字数：${article.data.wc})",
+                              "(${getRelatedTime(context, str2Date(article.data.date.curr))}，${S.of(context).author}：${article.data.author}，${S.of(context).word_count}：${article.data.wc})",
                           style: TextStyle(
                             color: Colors.grey,
                             fontSize: _fontSize - 3,
@@ -106,20 +105,20 @@ class _HomePageState extends State<HomePage> {
                     ),
                     SingleChildScrollView(
                         child: Text(
-                      article?.data?.content,
+                      article.data.content,
                       style: TextStyle(fontSize: _fontSize),
                       textAlign: TextAlign.start,
                     ))
                   ],
                 ),
-                color: Color(0xCCCCCC)),
+                color: themeColors[5]),
           )),
       floatingActionButton: new Builder(builder: (BuildContext context) {
         return new FloatingActionButton(
           child: const Icon(Icons.date_range),
-          tooltip: "选择日期",
+          tooltip: S.of(context).select_date,
           foregroundColor: Colors.white,
-          backgroundColor: Colors.blue,
+          backgroundColor: themeColors[_themeColorIndex],
           heroTag: null,
           onPressed: () {
             selectDate(context);
@@ -162,7 +161,8 @@ class _HomePageState extends State<HomePage> {
     final DateTime picked = await showDatePicker(
         context: context,
         initialDate: str2Date(article.date),
-        firstDate: DateTime(2015, 8),
+        // api的初始日期
+        firstDate: DateTime(2012, 4,15),
         lastDate: str2Date(article.date));
     if (picked != null && picked != article.date) {
       ArticleBean bean = await Article.getArticle(date: formatDate(picked));
@@ -196,7 +196,7 @@ class _HomePageState extends State<HomePage> {
             child: new Padding(
                 padding: EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 12.0),
                 child: new Text(
-                  '取  消',
+                  S.of(context).action_cancel,
                   style: new TextStyle(fontSize: 18.0, color: Colors.blueGrey),
                 )),
           )
@@ -211,90 +211,31 @@ class _HomePageState extends State<HomePage> {
   Widget _getItem(int index) {
     TextStyle style = const TextStyle(color: Colors.white);
     if (index & 1 == 1) {
-      switch (index) {
-        case 1:
-          return new Padding(
-            padding: EdgeInsets.fromLTRB(36, 0, 36.0, 0),
-            child: MaterialButton(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Icon(
-                    article?.starred ? Icons.star : Icons.star_border,
-                    color: Colors.white,
-                  ),
-                  Container(
-                    width: 6,
-                  ),
-                  Text(
-                    article?.starred ? "已收藏" : "未收藏",
-                    style: style,
-                  )
-                ],
+      return new Padding(
+        padding: EdgeInsets.fromLTRB(36, 0, 36.0, 0),
+        child: MaterialButton(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(
+                _iconData(index),
+                color: Colors.white,
               ),
-              color: Colors.blue,
-              onPressed: () {
-                onStarPressed();
-                Navigator.of(context).pop();
-              },
-            ),
-          );
-        case 3:
-          return new Padding(
-            padding: EdgeInsets.fromLTRB(36, 0, 36.0, 0),
-            child: MaterialButton(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Icon(
-                    Icons.content_copy,
-                    color: Colors.white,
-                  ),
-                  Container(
-                    width: 6,
-                  ),
-                  Text(
-                    "复制内容",
-                    style: style,
-                  )
-                ],
+              Container(
+                width: 6,
               ),
-              color: Colors.blue,
-              onPressed: () {
-                ClipboardData data = new ClipboardData(
-                    text:
-                        "${article.data.title}，作者：${article.data.author}，字数：${article.data.wc})\n${article?.data.content}");
-                Clipboard.setData(data);
-                Toast.toast(context, "复制成功");
-                Navigator.of(context).pop();
-              },
-            ),
-          );
-        case 5:
-          return new Padding(
-            padding: EdgeInsets.fromLTRB(36, 0, 36.0, 0),
-            child: MaterialButton(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Icon(
-                    Icons.share,
-                    color: Colors.white,
-                  ),
-                  Container(
-                    width: 6,
-                  ),
-                  Text(
-                    "分享",
-                    style: style,
-                  )
-                ],
-              ),
-              color: Colors.blue,
-              onPressed: _shaerMsg,
-            ),
-          );
-      }
+              Text(
+                _itemText(index),
+                style: style,
+              )
+            ],
+          ),
+          color: Colors.blue,
+          onPressed: () {
+            _onPressed(index);
+          },
+        ),
+      );
     } else {
       return new Container(
         height: 4,
@@ -305,14 +246,57 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<Null> _shaerMsg() async {
-    try {
-//      在通道上调用此方法
-      platform.invokeMethod("shareMsg",
-          "来自烤鱼的一文APP：\n${article.data.title}，作者：${article.data.author}，字数：${article.data.wc})\n${article?.data.content}");
-      Navigator.of(context).pop();
-    } on PlatformException catch (e) {
-      Navigator.of(context).pop();
+  IconData _iconData(int index) {
+    IconData iconData = null;
+    switch (index) {
+      case 1:
+        iconData = article?.starred ? Icons.star : Icons.star_border;
+        break;
+      case 3:
+        iconData = Icons.content_copy;
+        break;
+      case 5:
+        iconData = Icons.share;
+        break;
     }
+    return iconData;
+  }
+
+  String _itemText(int index) {
+    String text = "";
+    switch (index) {
+      case 1:
+        text = article?.starred
+            ? S.of(context).action_starred
+            : S.of(context).action_not_starred;
+        break;
+      case 3:
+        text = S.of(context).copy_content;
+        break;
+      case 5:
+        text = S.of(context).action_share;
+        break;
+    }
+    return text;
+  }
+
+  void _onPressed(int index) {
+    switch (index) {
+      case 1:
+        onStarPressed();
+        break;
+      case 3:
+        ClipboardData data = new ClipboardData(
+            text:
+                "${article.data.title}，作者：${article.data.author}，字数：${article.data.wc})\n${article?.data.content}");
+        Clipboard.setData(data);
+        Toast.toast(context, "复制成功");
+        break;
+      case 5:
+        platform.invokeMethod("shareMsg",
+            "来自烤鱼的一文APP：\n${article.data.title}，作者：${article.data.author}，字数：${article.data.wc})\n${article?.data.content}");
+        break;
+    }
+    Navigator.of(context).pop();
   }
 }
