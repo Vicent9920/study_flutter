@@ -21,5 +21,7 @@
   "select_date": "Select Date",
   "copy_content": "Copy Content",
   "action_share": "Share",
-  "action_setting": "Setting"
+  "action_setting": "Setting",
+  "action_copy_success": "Copy Success",
+  "select_color_dialog_title": "Please select the theme color"
 }

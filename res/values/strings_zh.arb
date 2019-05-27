@@ -21,5 +21,7 @@
   "select_date": "选择日期",
   "copy_content": "复制",
   "action_share": "分享",
-  "action_setting": "设置"
+  "action_setting": "设置",
+  "action_copy_success": "复制成功",
+  "select_color_dialog_title": "请选择主题颜色"
 }

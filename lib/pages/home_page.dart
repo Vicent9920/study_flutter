@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:study_flutter/bean/article_bean.dart';
+import 'package:study_flutter/bean/event.dart';
 import 'package:study_flutter/dao/Article.dart';
 import 'package:study_flutter/dao/db/database.dart';
 import 'package:study_flutter/generated/i18n.dart';
+import 'package:study_flutter/pages/select_dialog.dart';
 import 'package:study_flutter/pages/starred_list_page.dart';
 import 'package:study_flutter/utils/constant.dart';
 import 'package:study_flutter/utils/date_util.dart';
@@ -21,10 +24,12 @@ class HomePage extends StatefulWidget {
   }
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   ArticleBean article;
   final platform = const MethodChannel("samples.flutter.io/share");
   String date = formatDate(DateTime.now());
+  TabController _tabController;
 
   _HomePageState(this.article);
 
@@ -32,11 +37,11 @@ class _HomePageState extends State<HomePage> {
   int _themeColorIndex = 0;
 
   ArticleProvider provider;
-  String richText = "";
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 5, vsync: this);
     provider = ArticleProvider();
     getFontSize()
         .then((value) {
@@ -52,7 +57,13 @@ class _HomePageState extends State<HomePage> {
             });
           }
         });
-//    richText = "(${getRelatedTime(context, str2Date(article.data.date.curr))}，${S.of(context).author}：${article.data.author}，${S.of(context).word_count}：${article.data.wc})";
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    provider.getDB().then((db) => db.close());
+    super.dispose();
   }
 
   @override
@@ -92,7 +103,8 @@ class _HomePageState extends State<HomePage> {
                       alignment: Alignment.topRight,
                       child: Text.rich(
                         TextSpan(
-                          text: "(${getRelatedTime(context, str2Date(article.data.date.curr))}，${S.of(context).author}：${article.data.author}，${S.of(context).word_count}：${article.data.wc})",
+                          text:
+                              "(${getRelatedTime(context, str2Date(article.data.date.curr))}，${S.of(context).author}：${article.data.author}，${S.of(context).word_count}：${article.data.wc})",
                           style: TextStyle(
                             color: Colors.grey,
                             fontSize: _fontSize - 3,
@@ -163,7 +175,7 @@ class _HomePageState extends State<HomePage> {
         context: context,
         initialDate: str2Date(article.date),
         // api的初始日期
-        firstDate: DateTime(2012, 4,15),
+        firstDate: DateTime(2012, 4, 15),
         lastDate: str2Date(article.date));
     if (picked != null && picked != article.date) {
       ArticleBean bean = await Article.getArticle(date: formatDate(picked));
@@ -298,15 +310,98 @@ class _HomePageState extends State<HomePage> {
       case 3:
         ClipboardData data = new ClipboardData(
             text:
-                "${article.data.title}，作者：${article.data.author}，字数：${article.data.wc})\n${article?.data.content}");
+                "${article.data.title}，${S.of(context).author}：${article.data.author}，${S.of(context).word_count}：${article.data.wc})\n${article?.data.content}");
         Clipboard.setData(data);
-        Toast.toast(context, "复制成功");
+        Toast.toast(context, S.of(context).action_copy_success);
         break;
       case 5:
         platform.invokeMethod("shareMsg",
-            "来自烤鱼的一文APP：\n${article.data.title}，作者：${article.data.author}，字数：${article.data.wc})\n${article?.data.content}");
+            "来自烤鱼的一文APP：\n${article.data.title}，${S.of(context).author}：${article.data.author}，${S.of(context).word_count}：${article.data.wc})\n${article?.data.content}");
         break;
+      case 7:
+        Navigator.of(context).pop();
+        selectColor();
+        return;
     }
     Navigator.of(context).pop();
+  }
+
+  Future<void> selectColor() async {
+    int _lastIndex = _themeColorIndex;
+    _tabController.index = _lastIndex;
+    _listen();
+    return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return SelectDialog(index:_themeColorIndex);
+//          return AlertDialog(
+//            title: Text(S.of(context).select_color_dialog_title),
+//            content: Container(
+//              child: TabBar(
+//                tabs: themeTabs(_themeColorIndex),
+//                isScrollable: false,
+//                controller: _tabController,
+//                indicatorPadding: const EdgeInsets.only(left: 12, right: 12),
+//                onTap: (int) {
+//                  setState(() {
+//                    _themeColorIndex = int;
+//                  });
+//                },
+//                indicatorColor: themeColors[_themeColorIndex],
+//              ),
+//            ),
+//            actions: <Widget>[
+//              new CupertinoButton(
+//                  onPressed: () {
+//                    onTap(_lastIndex);
+//                    Navigator.of(context).pop();
+//                  },
+//                  child: Text(S.of(context).action_cancel)),
+//              new CupertinoButton(
+//                  onPressed: () {
+//                    onTap(_lastIndex);
+//                    Navigator.of(context).pop();
+//                    // 保存主题颜色
+//                  },
+//                  child: Text(S.of(context).action_ok)),
+//            ],
+//          );
+        });
+  }
+
+
+  List<Tab> themeTabs(int _themeColorIndex) {
+    List<Tab> tabs = List();
+    for (Color color in themeColors) {
+      if(color == themeColors.last){
+        continue;
+      }
+      if (color == themeColors[_themeColorIndex]) {
+        tabs.add(Tab(icon: Icon(Icons.check_box, color: color)));
+      } else {
+        tabs.add(Tab(icon: Icon(Icons.check_box_outline_blank, color: color)));
+      }
+    }
+    return tabs;
+  }
+
+  void onTap(int lastIndex) {
+    if (_themeColorIndex == lastIndex) {
+      storeThemeColor(lastIndex);
+    } else {
+      storeThemeColor(_themeColorIndex);
+    }
+    setState(() {
+      _themeColorIndex = lastIndex;
+    });
+  }
+
+  void _listen() {
+    eventBus.on<SelectColorEvent>().listen((event){
+      setState(() {
+        _themeColorIndex = event.index;
+      });
+    });
   }
 }

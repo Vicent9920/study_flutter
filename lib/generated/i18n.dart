@@ -20,6 +20,7 @@ class S implements WidgetsLocalizations {
   TextDirection get textDirection => TextDirection.ltr;
 
   String get action_cancel => "Cancel";
+  String get action_copy_success => "Copy Success";
   String get action_font_size => "Font Size";
   String get action_load_error => "Load Error";
   String get action_loading => "Loading";
@@ -37,6 +38,7 @@ class S implements WidgetsLocalizations {
   String get day_after => "Day After";
   String get day_before => "Day Before";
   String get random => "Random";
+  String get select_color_dialog_title => "Please select the theme color";
   String get select_date => "Select Date";
   String get title_clear_starred => "Are you sure to clear all starred articles?";
   String get today => "Today";
@@ -57,21 +59,13 @@ class $zh extends S {
   @override
   String get select_date => "选择日期";
   @override
-  String get author => "作者";
-  @override
   String get action_not_starred => "未收藏";
-  @override
-  String get action_setting => "设置";
-  @override
-  String get title_clear_starred => "确定要清空所有收藏吗？";
   @override
   String get action_starred => "已收藏";
   @override
-  String get action_load_error => "加载失败";
-  @override
   String get yesterday => "昨天";
   @override
-  String get content_not_starred => "还没有收藏任何文章";
+  String get select_color_dialog_title => "请选择主题颜色";
   @override
   String get random => "随机";
   @override
@@ -79,27 +73,39 @@ class $zh extends S {
   @override
   String get action_loading => "加载中";
   @override
-  String get copy_content => "复制";
+  String get action_copy_success => "复制成功";
   @override
   String get action_cancel => "取消";
   @override
   String get action_ok => "确定";
   @override
-  String get day_before => "前一天";
-  @override
   String get content_load_error => "加载失败，点击重试。";
   @override
   String get today => "今天";
   @override
-  String get action_font_size => "字号";
-  @override
   String get action_theme => "主题";
+  @override
+  String get action_share => "分享";
+  @override
+  String get author => "作者";
+  @override
+  String get action_setting => "设置";
+  @override
+  String get title_clear_starred => "确定要清空所有收藏吗？";
+  @override
+  String get action_load_error => "加载失败";
+  @override
+  String get content_not_starred => "还没有收藏任何文章";
+  @override
+  String get copy_content => "复制";
+  @override
+  String get day_before => "前一天";
+  @override
+  String get action_font_size => "字号";
   @override
   String get action_starred_list => "收藏列表";
   @override
   String get day_after => "后一天";
-  @override
-  String get action_share => "分享";
 }
 
 class GeneratedLocalizationsDelegate extends LocalizationsDelegate<S> {
