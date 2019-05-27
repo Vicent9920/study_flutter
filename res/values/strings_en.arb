@@ -20,5 +20,6 @@
   "day_before": "Day Before",
   "select_date": "Select Date",
   "copy_content": "Copy Content",
-  "action_share": "Share"
+  "action_share": "Share",
+  "action_setting": "Setting"
 }

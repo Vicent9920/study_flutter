@@ -18,11 +18,12 @@ class MyApp extends StatelessWidget {
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: [
-        const Locale('en', 'US'), // 美国英语
-        const Locale('zh', 'CN'), // 中文简体
-        //其它Locales
-      ],
+      supportedLocales: S.delegate.supportedLocales,
+//      supportedLocales: [
+//        const Locale('en', 'US'), // 美国英语
+//        const Locale('zh', 'CN'), // 中文简体
+//        //其它Locales
+//      ],
       home: SplashPage(title: 'splash'),
     );
   }

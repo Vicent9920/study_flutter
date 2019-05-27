@@ -25,6 +25,7 @@ class S implements WidgetsLocalizations {
   String get action_loading => "Loading";
   String get action_not_starred => "Not Starred";
   String get action_ok => "OK";
+  String get action_setting => "Setting";
   String get action_share => "Share";
   String get action_starred => "Starred";
   String get action_starred_list => "Starred List";
@@ -60,6 +61,8 @@ class $zh extends S {
   @override
   String get action_not_starred => "未收藏";
   @override
+  String get action_setting => "设置";
+  @override
   String get title_clear_starred => "确定要清空所有收藏吗？";
   @override
   String get action_starred => "已收藏";
@@ -76,7 +79,7 @@ class $zh extends S {
   @override
   String get action_loading => "加载中";
   @override
-  String get copy_content => "复制内容";
+  String get copy_content => "复制";
   @override
   String get action_cancel => "取消";
   @override

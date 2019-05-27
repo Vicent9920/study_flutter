@@ -19,6 +19,7 @@
   "day_after": "后一天",
   "day_before": "前一天",
   "select_date": "选择日期",
-  "copy_content": "复制内容",
-  "action_share": "分享"
+  "copy_content": "复制",
+  "action_share": "分享",
+  "action_setting": "设置"
 }

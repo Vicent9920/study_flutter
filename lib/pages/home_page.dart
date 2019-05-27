@@ -32,6 +32,7 @@ class _HomePageState extends State<HomePage> {
   int _themeColorIndex = 0;
 
   ArticleProvider provider;
+  String richText = "";
 
   @override
   void initState() {
@@ -51,6 +52,7 @@ class _HomePageState extends State<HomePage> {
             });
           }
         });
+//    richText = "(${getRelatedTime(context, str2Date(article.data.date.curr))}，${S.of(context).author}：${article.data.author}，${S.of(context).word_count}：${article.data.wc})";
   }
 
   @override
@@ -90,8 +92,7 @@ class _HomePageState extends State<HomePage> {
                       alignment: Alignment.topRight,
                       child: Text.rich(
                         TextSpan(
-                          text:
-                              "(${getRelatedTime(context, str2Date(article.data.date.curr))}，${S.of(context).author}：${article.data.author}，${S.of(context).word_count}：${article.data.wc})",
+                          text: "(${getRelatedTime(context, str2Date(article.data.date.curr))}，${S.of(context).author}：${article.data.author}，${S.of(context).word_count}：${article.data.wc})",
                           style: TextStyle(
                             color: Colors.grey,
                             fontSize: _fontSize - 3,
@@ -179,7 +180,7 @@ class _HomePageState extends State<HomePage> {
     return new Container(
       color: Colors.transparent,
       padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
-      height: 230,
+      height: 280,
       child: new Column(
         children: <Widget>[
           _getItem(1),
@@ -187,6 +188,8 @@ class _HomePageState extends State<HomePage> {
           _getItem(3),
           _getItem(4),
           _getItem(5),
+          _getItem(6),
+          _getItem(7),
           new Container(
             margin: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
             height: 8,
@@ -210,6 +213,7 @@ class _HomePageState extends State<HomePage> {
    */
   Widget _getItem(int index) {
     TextStyle style = const TextStyle(color: Colors.white);
+    // 奇数
     if (index & 1 == 1) {
       return new Padding(
         padding: EdgeInsets.fromLTRB(36, 0, 36.0, 0),
@@ -258,6 +262,9 @@ class _HomePageState extends State<HomePage> {
       case 5:
         iconData = Icons.share;
         break;
+      case 7:
+        iconData = Icons.settings;
+        break;
     }
     return iconData;
   }
@@ -275,6 +282,9 @@ class _HomePageState extends State<HomePage> {
         break;
       case 5:
         text = S.of(context).action_share;
+        break;
+      case 7:
+        text = S.of(context).action_setting;
         break;
     }
     return text;
