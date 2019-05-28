@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:study_flutter/bean/event.dart';
@@ -12,22 +10,23 @@ class SelectDialog extends StatefulWidget {
 
   const SelectDialog({Key key, this.index}) : super(key: key);
 
-
-
   @override
   State<StatefulWidget> createState() {
     return _SelectDialogState();
   }
-
 }
-class _SelectDialogState extends State<SelectDialog> with SingleTickerProviderStateMixin{
+
+class _SelectDialogState extends State<SelectDialog>
+    with SingleTickerProviderStateMixin {
   int index = 0;
   Future<void> callback;
   TabController _tabController;
+
   @override
   void initState() {
     index = widget.index;
-    _tabController = new TabController(initialIndex:index,length: 5, vsync: this);
+    _tabController =
+        new TabController(initialIndex: index, length: 5, vsync: this);
     super.initState();
   }
 
@@ -36,6 +35,7 @@ class _SelectDialogState extends State<SelectDialog> with SingleTickerProviderSt
     _tabController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -45,7 +45,8 @@ class _SelectDialogState extends State<SelectDialog> with SingleTickerProviderSt
           tabs: themeTabs(index),
           isScrollable: false,
           controller: _tabController,
-          indicatorPadding: const EdgeInsets.only(left: 12, right: 12),
+//            indicatorPadding: const EdgeInsets.only(left: 12, right: 12),
+          indicator: const BoxDecoration(),
           onTap: (int) {
             //Bus触发事件
             eventBus.fire(new SelectColorEvent(int));
@@ -53,19 +54,20 @@ class _SelectDialogState extends State<SelectDialog> with SingleTickerProviderSt
               index = int;
             });
           },
-          indicatorColor: themeColors[index],
+//            indicatorColor: themeColors[index],
+//            indicatorSize: TabBarIndicatorSize.label
         ),
       ),
       actions: <Widget>[
         new CupertinoButton(
             onPressed: () {
-              onTap(index);
+              onTap();
               Navigator.of(context).pop();
             },
             child: Text(S.of(context).action_cancel)),
         new CupertinoButton(
             onPressed: () {
-              onTap(index);
+              onTap();
               Navigator.of(context).pop();
               // 保存主题颜色
             },
@@ -77,7 +79,7 @@ class _SelectDialogState extends State<SelectDialog> with SingleTickerProviderSt
   List<Tab> themeTabs(int _themeColorIndex) {
     List<Tab> tabs = List();
     for (Color color in themeColors) {
-      if(color == themeColors.last){
+      if (color == themeColors.last) {
         continue;
       }
       if (color == themeColors[_themeColorIndex]) {
@@ -89,14 +91,18 @@ class _SelectDialogState extends State<SelectDialog> with SingleTickerProviderSt
     return tabs;
   }
 
-  void onTap(int lastIndex) {
-    if (index == lastIndex) {
-      storeThemeColor(lastIndex);
-    } else {
-      storeThemeColor(index);
-    }
-    setState(() {
-      index = lastIndex;
+  void onTap() {
+    var lastIndex = getThemeColor();
+    lastIndex.then((oldValue) {
+      if (index != oldValue) {
+        //Bus触发事件
+        eventBus.fire(new SelectColorEvent(oldValue));
+        setState(() {
+          index = oldValue;
+        });
+      } else {
+        storeThemeColor(index);
+      }
     });
   }
-  }
+}

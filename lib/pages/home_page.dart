@@ -334,71 +334,12 @@ class _HomePageState extends State<HomePage>
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return SelectDialog(index:_themeColorIndex);
-//          return AlertDialog(
-//            title: Text(S.of(context).select_color_dialog_title),
-//            content: Container(
-//              child: TabBar(
-//                tabs: themeTabs(_themeColorIndex),
-//                isScrollable: false,
-//                controller: _tabController,
-//                indicatorPadding: const EdgeInsets.only(left: 12, right: 12),
-//                onTap: (int) {
-//                  setState(() {
-//                    _themeColorIndex = int;
-//                  });
-//                },
-//                indicatorColor: themeColors[_themeColorIndex],
-//              ),
-//            ),
-//            actions: <Widget>[
-//              new CupertinoButton(
-//                  onPressed: () {
-//                    onTap(_lastIndex);
-//                    Navigator.of(context).pop();
-//                  },
-//                  child: Text(S.of(context).action_cancel)),
-//              new CupertinoButton(
-//                  onPressed: () {
-//                    onTap(_lastIndex);
-//                    Navigator.of(context).pop();
-//                    // 保存主题颜色
-//                  },
-//                  child: Text(S.of(context).action_ok)),
-//            ],
-//          );
+          return SelectDialog(index: _themeColorIndex);
         });
   }
 
-
-  List<Tab> themeTabs(int _themeColorIndex) {
-    List<Tab> tabs = List();
-    for (Color color in themeColors) {
-      if(color == themeColors.last){
-        continue;
-      }
-      if (color == themeColors[_themeColorIndex]) {
-        tabs.add(Tab(icon: Icon(Icons.check_box, color: color)));
-      } else {
-        tabs.add(Tab(icon: Icon(Icons.check_box_outline_blank, color: color)));
-      }
-    }
-    return tabs;
-  }
-
-  void onTap(int lastIndex) {
-    if (_themeColorIndex == lastIndex) {
-      storeThemeColor(lastIndex);
-    } else {
-      storeThemeColor(_themeColorIndex);
-    }
-    setState(() {
-      _themeColorIndex = lastIndex;
-    });
-  }
-
   void _listen() {
-    eventBus.on<SelectColorEvent>().listen((event){
+    eventBus.on<SelectColorEvent>().listen((event) {
       setState(() {
         _themeColorIndex = event.index;
       });
