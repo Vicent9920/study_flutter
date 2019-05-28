@@ -11,13 +11,12 @@
 ![收藏列表](./screen_capute/study_flutter4.jpg)
 ![删除列表](./screen_capute/study_flutter7.jpg)
 ![空列表](./screen_capute/study_flutter8.jpg)
+![设置主题颜色](./screen_capute/study_flutter9.gif)
 
 
 
 
 ## 待完成
-
- * 完成主体颜色修改
  * 利用玩安卓的api实现TODO清单功能
  
  ---

@@ -192,7 +192,7 @@ class _HomePageState extends State<HomePage>
     return new Container(
       color: Colors.transparent,
       padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
-      height: 280,
+      height: 285,
       child: new Column(
         children: <Widget>[
           _getItem(1),

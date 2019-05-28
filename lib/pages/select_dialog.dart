@@ -61,13 +61,13 @@ class _SelectDialogState extends State<SelectDialog>
       actions: <Widget>[
         new CupertinoButton(
             onPressed: () {
-              onTap();
+              onTap(true);
               Navigator.of(context).pop();
             },
             child: Text(S.of(context).action_cancel)),
         new CupertinoButton(
             onPressed: () {
-              onTap();
+              onTap(false);
               Navigator.of(context).pop();
               // 保存主题颜色
             },
@@ -91,18 +91,21 @@ class _SelectDialogState extends State<SelectDialog>
     return tabs;
   }
 
-  void onTap() {
+  void onTap(bool isCancel) {
     var lastIndex = getThemeColor();
     lastIndex.then((oldValue) {
-      if (index != oldValue) {
-        //Bus触发事件
-        eventBus.fire(new SelectColorEvent(oldValue));
-        setState(() {
-          index = oldValue;
-        });
-      } else {
+      if(isCancel){
+        if (index != oldValue) {
+          //Bus触发事件
+          eventBus.fire(new SelectColorEvent(oldValue));
+//        setState(() {
+//          index = oldValue;
+//        });
+        }
+      }else{
         storeThemeColor(index);
       }
+
     });
   }
 }
